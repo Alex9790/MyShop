@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../screens/product_detail_screen.dart';
+
 //este Widget sera el item dentro del Grid que contendra la informacion de cada producto
 class ProductItem extends StatelessWidget {
   final String id;
@@ -15,10 +17,20 @@ class ProductItem extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       //parecido al ListTile de ListViews
       child: GridTile(
-        child: Image.network(
-          imageUrl,
-          //para que use todo el espacio que pueda obtener
-          fit: BoxFit.cover,
+        //Widget para implementar un listener, debido a que Image() no tiene esa opcion
+        child: GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              ProductDetailScreen.routeName,
+              //se envia solo el id para q a partir de el acceder al arreglo con todos los demas datos
+              arguments: id,
+            );
+          },
+          child: Image.network(
+            imageUrl,
+            //para que use todo el espacio que pueda obtener
+            fit: BoxFit.cover,
+          ),
         ),
         //configura una barra ubicada en el footer de GridTile
         footer: GridTileBar(
