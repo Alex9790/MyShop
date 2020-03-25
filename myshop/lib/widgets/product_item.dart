@@ -10,29 +10,36 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //parecido al ListTile de ListViews
-    return GridTile(
-      child: Image.network(
-        imageUrl,
-        //para que use todo el espacio que pueda obtener
-        fit: BoxFit.cover,
-      ),
-      //configura una barra ubicada en el footer de GridTile
-      footer: GridTileBar(
-        backgroundColor: Colors.black54,
-        //define Widget al inicio de la barra
-        leading: IconButton(
-          icon: Icon(Icons.favorite),
-          onPressed: () {},
+    //Clip Rounded Rectangle, forza los elementos hijos a adaptarse a una forma definida
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      //parecido al ListTile de ListViews
+      child: GridTile(
+        child: Image.network(
+          imageUrl,
+          //para que use todo el espacio que pueda obtener
+          fit: BoxFit.cover,
         ),
-        //define contenido en el centro de la Barra
-        title: Text(
-          title,
-          textAlign: TextAlign.center,
-        ),
-        trailing: IconButton(
-          icon: Icon(Icons.shopping_cart),
-          onPressed: () {},
+        //configura una barra ubicada en el footer de GridTile
+        footer: GridTileBar(
+          //background negro con opacidad 54 / permitiendo ese efecto de transparencia
+          backgroundColor: Colors.black87,
+          //define Widget al inicio de la barra
+          leading: IconButton(
+            icon: Icon(Icons.favorite),
+            onPressed: () {},
+            color: Theme.of(context).accentColor,
+          ),
+          //define contenido en el centro de la Barra
+          title: Text(
+            title,
+            textAlign: TextAlign.center,
+          ),
+          trailing: IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {},
+            color: Theme.of(context).accentColor,
+          ),
         ),
       ),
     );
