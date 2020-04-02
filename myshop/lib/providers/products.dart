@@ -42,7 +42,12 @@ class Products with ChangeNotifier {
   //para obtener copia de datos _items
   List<Product> get items {
     //se retorna una copia de los datos originales, en vez de un apuntado a los mismos (return items;)
-    return [...items];
+    return [..._items];
+  }
+
+  //se busca el produto con el id recibido por parametro
+  Product findById(String id){
+    return _items.firstWhere((producto) => producto.id == id);
   }
 
   void addProduct(){
