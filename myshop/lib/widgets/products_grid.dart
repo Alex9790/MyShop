@@ -5,10 +5,8 @@ import '../providers/products.dart';
 import './product_item.dart';
 
 class ProductsGrid extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
-
     //Configuracion del Listener para escuchar los cambios realizados en el State Provider "Products"
     //le decimos al Package Provider que queremos comunicacion directa con la instancia proveida de la clase Products
     //de esta forma Provider rastrea toda la ascendencia de est Widget hasta encontrar al Proveedor que provee una instancia de tipo Products
@@ -29,10 +27,15 @@ class ProductsGrid extends StatelessWidget {
         mainAxisSpacing: 10,
       ),
       //gestionara los Widgets que se muestren dentro del Grid
-      itemBuilder: (context, index) => ProductItem(
-        products[index].id,
-        products[index].title,
-        products[index].imageUrl,
+      //Se enlaza con el State Provider Product que proveera la data de cada producto individualmente
+      itemBuilder: (context, index) => ChangeNotifierProvider(
+        //Objeto a proveer a ProductItem, asi que ya no necesita pasar datos por parametros en un constructor
+        create: (context) => products[index],
+        child: ProductItem(
+          //products[index].id,
+          //products[index].title,
+          //products[index].imageUrl,
+        ),
       ),
       //se usa const para evitar q e vuelva a renderizar cuando se actualice el estado de la App
       padding: const EdgeInsets.all(10.0),

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart'; //para poder agregar @required
 
 //clase que servira de modelo para todos los productos
-class Product {
+class Product with ChangeNotifier{
   final String id;
   final String title;
   final String description;
@@ -16,4 +16,11 @@ class Product {
       @required this.price,
       @required this.imageUrl,
       this.isFavorite = false});  //valor por defecto
+
+  void toggleFavoriteStatus(){
+    //invierte el valor del boolean que representa si es favorito o no
+    isFavorite = !isFavorite;
+    //informar a los listener para que actualicen, parece en setState()
+    notifyListeners();
+  }
 }
