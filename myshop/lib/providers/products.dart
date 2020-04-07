@@ -38,11 +38,22 @@ class Products with ChangeNotifier {
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
   ];
+  //para filtrar lista de productos
+  /*Esta forma de aplicar filtros afectara todas las pantallas de productos, por lo que no se recomienda
+  var _showFavoritesOnly = false;*/
 
   //para obtener copia de datos _items
   List<Product> get items {
+    /*Esta forma de aplicar filtros afectara todas las pantallas de productos, por lo que no se recomienda
+    if(_showFavoritesOnly){
+      return _items.where((prodItem) => prodItem.isFavorite).toList();
+    }*/
     //se retorna una copia de los datos originales, en vez de un apuntado a los mismos (return items;)
     return [..._items];
+  }
+
+  List<Product> get favoriteItems {
+    return _items.where((prodItem) => prodItem.isFavorite).toList();    
   }
 
   //se busca el produto con el id recibido por parametro
@@ -57,4 +68,16 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
+/*Esta forma de aplicar filtros afectara todas las pantallas de productos, por lo que no se recomienda
+
+  void showFavoritesOnly (){
+    _showFavoritesOnly = true;
+    notifyListeners();
+  }
+
+  void showAll (){
+    _showFavoritesOnly = false;
+    notifyListeners();
+  }
+*/
 }

@@ -10,9 +10,10 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider.value(
       //se debe agregar una instancia de la clase provider a utilizar, antes el argumento era "builder"
-      create: (ctx) => Products(),
+      //create: (ctx) => Products(),
+      value: Products(),
       child: MaterialApp(
         title: 'MyShop',
         theme: ThemeData(
