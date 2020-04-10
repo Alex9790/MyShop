@@ -23,10 +23,19 @@ class Cart with ChangeNotifier {
   Map<String, CartItem> get items {
     return {..._items};
   }
-
-  int get itemCount {
-    //retorna la cantidad de productos contenidos en el Map
+  
+  //retorna la cantidad de productos contenidos en el Map
+  int get itemCount {  
     return _items.length;
+  }
+
+  //Monto total del pedido
+  double get totalAmount {
+    var total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
   }
 
   //metodo para agregar productos al carrito, se asume cantidad 1, se agregan productos uno por uno

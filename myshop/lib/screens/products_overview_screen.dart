@@ -6,6 +6,7 @@ import '../widgets/products_grid.dart';
 //import '../providers/products.dart';
 import '../widgets/badge.dart';
 import '../providers/cart.dart';
+import '../screens/cart_screen.dart';
 
 //Forma de asignar Labels a Integers
 enum FilterOptions {
@@ -71,8 +72,14 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
             },
             //se usa este argumento para que Consumer no lo rebuild, y obtenerlo como parametro en el builder "child1"
             child: IconButton(
-              icon: Icon(Icons.shopping_cart, color: Colors.white,),
-              onPressed: null,
+              icon: Icon(
+                Icons.shopping_cart,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                //ir a la pantalla del carrito
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
             ),
           ),
         ],
