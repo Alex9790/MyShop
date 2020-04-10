@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 //import 'package:provider/provider.dart';
 
 import '../widgets/products_grid.dart';
 //import '../providers/products.dart';
+import '../widgets/badge.dart';
+import '../providers/cart.dart';
 
 //Forma de asignar Labels a Integers
 enum FilterOptions {
@@ -28,15 +31,15 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         //botones para el AppBar
         actions: <Widget>[
           PopupMenuButton(
-            onSelected: (FilterOptions selectedValue) {              
+            onSelected: (FilterOptions selectedValue) {
               setState(() {
-                if(selectedValue == FilterOptions.Favorites){
-                //productsContainer.showFavoritesOnly();
-                _showOnlyFavorites = true;
-              }else{
-                //productsContainer.showAll();
-                _showOnlyFavorites = false;
-              }
+                if (selectedValue == FilterOptions.Favorites) {
+                  //productsContainer.showFavoritesOnly();
+                  _showOnlyFavorites = true;
+                } else {
+                  //productsContainer.showAll();
+                  _showOnlyFavorites = false;
+                }
               });
             },
             icon: Icon(
@@ -55,6 +58,22 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 value: FilterOptions.All,
               ),
             ],
+          ),
+          //Icono para ir al Carrito, se usa el Widget Badge() que provee el curso
+          //Se usa Consumer para solo rebuild los widgets contenidos en el argumento "builder"
+          Consumer<Cart>(
+            builder: (context, cart, child1) {
+              return Badge(
+                child: child1,
+                //esto es lo unico que nos interesa actualizar
+                value: cart.itemCount.toString(),
+              );
+            },
+            //se usa este argumento para que Consumer no lo rebuild, y obtenerlo como parametro en el builder "child1"
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart, color: Colors.white,),
+              onPressed: null,
+            ),
           ),
         ],
       ),

@@ -17,11 +17,16 @@ class CartItem {
 
 class Cart with ChangeNotifier {
   //Map donde la key es el id del producto
-  Map<String, CartItem> _items;
+  Map<String, CartItem> _items = {};
 
   //Metodo get para obtener todos los productos del carrito
   Map<String, CartItem> get items {
     return {..._items};
+  }
+
+  int get itemCount {
+    //retorna la cantidad de productos contenidos en el Map
+    return _items.length;
   }
 
   //metodo para agregar productos al carrito, se asume cantidad 1, se agregan productos uno por uno
@@ -50,5 +55,10 @@ class Cart with ChangeNotifier {
         ),
       );
     }
+    //recordar siempre
+    notifyListeners();
   }
+
+
+
 }
