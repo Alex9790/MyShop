@@ -68,6 +68,10 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
-
+  //metodo para eliminar elementos del Map _items
+  void removeItem(String productId){
+    _items.remove(productId);
+    notifyListeners();
+  }
 
 }
