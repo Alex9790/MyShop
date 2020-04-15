@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/cart.dart' show Cart;
 import '../widgets/cart_item.dart';
+import '../providers/orders.dart';
 
 class CartScreen extends StatelessWidget {
   static const routeName = "/cart";
@@ -45,7 +46,17 @@ class CartScreen extends StatelessWidget {
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                   FlatButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      //Se accede a la lista de Pedidos y se le agrega un nuevo pedido
+                      //en vez de pasar todo el Map se pasa solo la lista de productos
+                      //no quereos escuchar aqui porque solo queremos registrar un pedido
+                      Provider.of<Orders>(context, listen: false).addOrder(
+                        cart.items.values.toList(),
+                        cart.totalAmount,
+                      );
+                      //se eliminan los items del carrito
+                      cart.clear();
+                    },
                     child: Text(
                       "Order Now!",
                       style: TextStyle(
