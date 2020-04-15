@@ -74,4 +74,10 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
+  //metodo para limpiar todo el carrito
+  void clear(){
+    _items = {};
+    notifyListeners();
+  }
+
 }
