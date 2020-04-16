@@ -38,7 +38,8 @@ class CartScreen extends StatelessWidget {
                   //Widget que crea un contenedor ovalado
                   Chip(
                     label: Text(
-                      "\$${cart.totalAmount}",
+                      //limitar la cantidad de decimales a 2
+                      "\$${cart.totalAmount.toStringAsFixed(2)}",
                       style: TextStyle(
                         color: Theme.of(context).primaryTextTheme.title.color,
                       ),
