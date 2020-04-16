@@ -7,6 +7,7 @@ import '../widgets/products_grid.dart';
 import '../widgets/badge.dart';
 import '../providers/cart.dart';
 import '../screens/cart_screen.dart';
+import '../widgets/app_drawer.dart';
 
 //Forma de asignar Labels a Integers
 enum FilterOptions {
@@ -84,6 +85,8 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           ),
         ],
       ),
+      //Para incluir en esta pantalla el Drawer definido
+      drawer: AppDrawer(),
       //se utiliza el metodo builder() que funciona igual a las ListView() donde no sabes cuantos elementos seran, y se mostraran solo los que quepan en pantalla
       body: ProductsGrid(_showOnlyFavorites),
     );
