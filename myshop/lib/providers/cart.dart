@@ -23,9 +23,9 @@ class Cart with ChangeNotifier {
   Map<String, CartItem> get items {
     return {..._items};
   }
-  
+
   //retorna la cantidad de productos contenidos en el Map
-  int get itemCount {  
+  int get itemCount {
     return _items.length;
   }
 
@@ -68,16 +68,40 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeSingleItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      //en caso de que el carrito no tenga este producto
+      return;
+    }
+    //actualizar la cantidad de productos
+    if (_items[productId].quantity > 1) {
+      //si tiene mas de un mismo producto, se reduce la cantidad en 1      
+      _items.update(
+        productId,
+        (existingCartItem) => CartItem(
+          id: existingCartItem.id,
+          title: existingCartItem.title,
+          quantity: existingCartItem.quantity - 1,
+          price: existingCartItem.price,
+        ),
+      );
+    }else{
+      //si tiene un solo produto, se elimina
+      _items.remove(productId);
+    }
+
+    notifyListeners();
+  }
+
   //metodo para eliminar elementos del Map _items
-  void removeItem(String productId){
+  void removeItem(String productId) {
     _items.remove(productId);
     notifyListeners();
   }
 
   //metodo para limpiar todo el carrito
-  void clear(){
+  void clear() {
     _items = {};
     notifyListeners();
   }
-
 }

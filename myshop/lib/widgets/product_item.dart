@@ -64,8 +64,25 @@ class ProductItem extends StatelessWidget {
           ),
           trailing: IconButton(
             icon: Icon(Icons.shopping_cart),
-            onPressed: () =>
-                cart.addItem(producto.id, producto.price, producto.title),
+            onPressed: () {
+              cart.addItem(producto.id, producto.price, producto.title);
+              //evita que se solapen los snackbars por presionar varias veces
+              Scaffold.of(context).hideCurrentSnackBar();
+              //mensaje popup al fondo de la pantalla cuando agregue producto al carrito
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Producto agregado al Carrito",
+                      textAlign: TextAlign.center),
+                  duration: Duration(seconds: 2),
+                  action: SnackBarAction(
+                    label: "Deshacer",
+                    onPressed: () {
+                      cart.removeSingleItem(producto.id);
+                    },
+                  ),
+                ),
+              );
+            },
             color: Theme.of(context).accentColor,
           ),
         ),
