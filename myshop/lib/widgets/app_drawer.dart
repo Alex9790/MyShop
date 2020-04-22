@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../screens/orders_screen.dart';
+import '../screens/user_products_screen.dart';
 
 //Widget para definir un Drawer a la App
 class AppDrawer extends StatelessWidget {
@@ -30,6 +31,15 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               //redirige a la pantalla de Pedidos
               Navigator.of(context).pushReplacementNamed(OrdersScreen.routeName);
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.edit),
+            title: Text("Gestion de Productos"),
+            onTap: () {
+              //redirige a la pantalla de Gestion de Productos
+              Navigator.of(context).pushReplacementNamed(UserProductsScreen.routeName);
             },
           ),
         ],

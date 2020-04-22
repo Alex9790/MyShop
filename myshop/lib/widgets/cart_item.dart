@@ -33,6 +33,37 @@ class CartItem extends StatelessWidget {
       ),
       //argumento para restringir la animacion, en este caso sera para eliminar solo de derecha a izquierda
       direction: DismissDirection.endToStart,
+      //Para mostrar mensaje de confirmacion al momento de eliminar item, esta funcion debe retornar una clase Future que retorne true/false
+      confirmDismiss: (direction) {
+        //return Future.value(true);
+        //a diferencia del SnackBar para el Dialog no necesitas un Scaffold(), showDialog retorna Future
+        return showDialog(
+          //se le asigna el context del widget
+          context: context,
+          //todos los builders usan context
+          builder: (ctx) => AlertDialog(
+            title: Text("Eliminar item"),
+            content: Text("Seguro que desea eliminar?"),
+            //los botones del dialog, deben ser FlatButton
+            actions: <Widget>[
+              FlatButton(
+                child: Text("No"),
+                onPressed: () {
+                  //cerrara el Dialog y le retornara a showDialog() el valor false, por lo tanto NO eliminara el item
+                  Navigator.of(ctx).pop(false);
+                },
+              ),
+              FlatButton(
+                child: Text("Yes"),
+                onPressed: () {
+                  //cerrara el Dialog y le retornara a showDialog() el valor false, por lo tanto SI eliminara el item
+                  Navigator.of(ctx).pop(true);
+                },
+              ),
+            ],
+          ),
+        );
+      },
       //Event Listener, funcion que se ejecuta cuando se elimina un elemento de la vista
       //direction: en caso de querer hacer algo diferente dependiendo de la direccion
       onDismissed: (direction) {
@@ -44,9 +75,9 @@ class CartItem extends StatelessWidget {
           padding: EdgeInsets.all(8),
           child: ListTile(
             leading: CircleAvatar(
-              //como es una solo palabra lo {} no son necesarios
               child: Padding(
                   padding: EdgeInsets.all(5),
+                  //como es una solo palabra lo {} no son necesarios
                   child: FittedBox(child: Text("\$$price"))),
             ),
             title: Text(title),
