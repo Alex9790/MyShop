@@ -53,6 +53,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _saveForm() {
+    //metodo para ejecutar todas las validaciones definidas en los "validator" de cada TextFormField()
+    final isValid = _form.currentState.validate();
+    if(!isValid){
+      return;
+    }
     //metodo de Flutter para guardar los datos del formulario
     _form.currentState.save();
     print(_editedProduct.id);
@@ -102,6 +107,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       description: _editedProduct.description,
                       price: _editedProduct.price,
                       imageUrl: _editedProduct.imageUrl);
+                },
+                validator: (value) {
+                  if(value.isEmpty){
+                    return "Debe llenar este campo.";
+                  }
+                  return null;
                 },
               ),
               TextFormField(
