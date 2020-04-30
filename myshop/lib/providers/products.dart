@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import './product.dart';
 
 class Products with ChangeNotifier {
-
   List<Product> _items = [
     Product(
       id: 'p1',
@@ -53,16 +52,25 @@ class Products with ChangeNotifier {
   }
 
   List<Product> get favoriteItems {
-    return _items.where((prodItem) => prodItem.isFavorite).toList();    
+    return _items.where((prodItem) => prodItem.isFavorite).toList();
   }
 
   //se busca el produto con el id recibido por parametro
-  Product findById(String id){
+  Product findById(String id) {
     return _items.firstWhere((producto) => producto.id == id);
   }
 
-  void addProduct(){
-    //_items.add(value);
+  void addProduct(Product product) {
+    final newProduct = Product(
+        id: DateTime.now().toString(),
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl);
+    
+    _items.add(newProduct);
+    //para insertar al inicio de la lista
+    //_items.insert(0, newProduct);
     //se utiliza para informar a todos los Widgets que estan conectados a este Provider con Listener
     //que hay informacion nueva disponible
     notifyListeners();

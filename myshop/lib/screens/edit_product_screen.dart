@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/product.dart';
+import '../providers/products.dart';
 
 //clase utilizada para agregar o editar productos
 class EditProductScreen extends StatefulWidget {
@@ -61,11 +63,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
     //metodo de Flutter para guardar los datos del formulario
     _form.currentState.save();
-    print(_editedProduct.id);
-    print(_editedProduct.title);
-    print(_editedProduct.description);
-    print(_editedProduct.price);
-    print(_editedProduct.imageUrl);
+
+    //se realiza el insert a la lista de productos
+    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+
+    //para descartar esta pantalla y dirigirnos a la anterior que muestra todos los productos
+    Navigator.of(context).pop();
   }
 
   @override
