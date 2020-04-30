@@ -47,6 +47,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void _updateImageUrl() {
     //cuando se pierde el focus del input
     if (!_imageUrlFocusNode.hasFocus) {
+      //se pueden agregar las mismas validaciones incluidas en el validator en este punto, pero utilizando _imageUrlFocusNode.text en vez de value
       //para que refresque pantalla
       setState(() {});
     }
@@ -55,7 +56,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void _saveForm() {
     //metodo para ejecutar todas las validaciones definidas en los "validator" de cada TextFormField()
     final isValid = _form.currentState.validate();
-    if(!isValid){
+    if (!isValid) {
       return;
     }
     //metodo de Flutter para guardar los datos del formulario
@@ -109,7 +110,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       imageUrl: _editedProduct.imageUrl);
                 },
                 validator: (value) {
-                  if(value.isEmpty){
+                  if (value.isEmpty) {
                     return "Debe llenar este campo.";
                   }
                   return null;
@@ -132,26 +133,49 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       price: double.parse(value),
                       imageUrl: _editedProduct.imageUrl);
                 },
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return "Debe llenar este campo.";
+                  }
+                  //retorna null si el numero es invalido, en vez de una excepcion, ideal para validar si es un numero
+                  if (double.tryParse(value) == null) {
+                    return "Debe ingresar un valor válido.";
+                  }
+                  if (double.parse(value) <= 0) {
+                    return "Debe ingresar un valor mayor a cero.";
+                  }
+                  return null;
+                },
               ),
               TextFormField(
-                  decoration: InputDecoration(labelText: "Descripcion"),
-                  //tomando en cuenta que este campo puede ser mas largo
-                  //muestra en pantalla simultaneamente tres lineas, pero se puede escribir tanto como se permita
-                  maxLines: 3,
-                  //un teclado mas util para este tipo de inputs
-                  keyboardType: TextInputType.multiline,
-                  focusNode: _descriptionFocusNode,
-                  onFieldSubmitted: (value) {
-                    FocusScope.of(context).requestFocus(_priceFocusNode);
-                  },
-                  onSaved: (value) {
-                    _editedProduct = Product(
-                        id: null,
-                        title: _editedProduct.title,
-                        description: value,
-                        price: _editedProduct.price,
-                        imageUrl: _editedProduct.imageUrl);
-                  }),
+                decoration: InputDecoration(labelText: "Descripcion"),
+                //tomando en cuenta que este campo puede ser mas largo
+                //muestra en pantalla simultaneamente tres lineas, pero se puede escribir tanto como se permita
+                maxLines: 3,
+                //un teclado mas util para este tipo de inputs
+                keyboardType: TextInputType.multiline,
+                focusNode: _descriptionFocusNode,
+                onFieldSubmitted: (value) {
+                  FocusScope.of(context).requestFocus(_priceFocusNode);
+                },
+                onSaved: (value) {
+                  _editedProduct = Product(
+                      id: null,
+                      title: _editedProduct.title,
+                      description: value,
+                      price: _editedProduct.price,
+                      imageUrl: _editedProduct.imageUrl);
+                },
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return "Debe llenar este campo.";
+                  }
+                  if (value.length < 10) {
+                    return "Debe ingresar un minimo de 10 carácteres.";
+                  }
+                  return null;
+                },
+              ),
               //contendra un preview de la imagen a cargar y la direccion
               Row(
                 //mueve todo el contenido hacia "el piso digamos" den espacio definido
@@ -174,28 +198,41 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                   Expanded(
                     child: TextFormField(
-                        decoration: InputDecoration(
-                          labelText: "Image URL",
-                        ),
-                        keyboardType: TextInputType.url,
-                        //cuando presione "enter" se intentara hacer submit
-                        textInputAction: TextInputAction.done,
-                        //se agrega controlador, porque se desea obtener el valor antes de submit
-                        controller: _imageUrlController,
-                        focusNode: _imageUrlFocusNode,
-                        //este es el ultimo input, asi que en el teclado en pantalla se vera un check, el cual queremos que haga submit tambien
-                        //el parametro "value" es el valor del input, en este caso no se necesita asi que se puede cambiar por (_)
-                        onFieldSubmitted: (value) {
-                          _saveForm();
-                        },
-                        onSaved: (value) {
-                          _editedProduct = Product(
-                              id: null,
-                              title: _editedProduct.title,
-                              description: _editedProduct.description,
-                              price: _editedProduct.price,
-                              imageUrl: value);
-                        }),
+                      decoration: InputDecoration(
+                        labelText: "Image URL",
+                      ),
+                      keyboardType: TextInputType.url,
+                      //cuando presione "enter" se intentara hacer submit
+                      textInputAction: TextInputAction.done,
+                      //se agrega controlador, porque se desea obtener el valor antes de submit
+                      controller: _imageUrlController,
+                      focusNode: _imageUrlFocusNode,
+                      //este es el ultimo input, asi que en el teclado en pantalla se vera un check, el cual queremos que haga submit tambien
+                      //el parametro "value" es el valor del input, en este caso no se necesita asi que se puede cambiar por (_)
+                      onFieldSubmitted: (value) {
+                        _saveForm();
+                      },
+                      onSaved: (value) {
+                        _editedProduct = Product(
+                            id: null,
+                            title: _editedProduct.title,
+                            description: _editedProduct.description,
+                            price: _editedProduct.price,
+                            imageUrl: value);
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Debe llenar este campo.";
+                        }
+                        if(!value.startsWith("http") && !value.startsWith("https")){
+                          return "El enlace no es válido, debe incluir el protocolo 'http' o 'https'.";
+                        }
+                        if(!value.endsWith(".png") && !value.endsWith(".jpg") && !value.endsWith(".jpeg")){
+                          return "Debe ingresar una imagen válida.";
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                 ],
               ),
