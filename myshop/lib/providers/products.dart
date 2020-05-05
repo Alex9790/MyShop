@@ -76,6 +76,19 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateProduct(String id, Product newProduct){
+    //para obtener el indice del product que se va a actualizar
+    final prodIndex = _items.indexWhere((prod) => prod.id == id);
+    if(prodIndex > 0){
+      //se actualiza con los nuevos datos
+      _items[prodIndex] = newProduct;
+      notifyListeners();
+    }else{
+      print("No se encontro el indice.");
+    }
+    
+  }
+
 /*Esta forma de aplicar filtros afectara todas las pantallas de productos, por lo que no se recomienda
 
   void showFavoritesOnly (){

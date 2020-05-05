@@ -25,12 +25,43 @@ class _EditProductScreenState extends State<EditProductScreen> {
   //pedido inicializado, que sera actualizado con los inputs del Form
   var _editedProduct =
       Product(id: null, title: "", description: "", price: 0, imageUrl: "");
+  //para que se ejecute solo una vez al iniciar el Widget
+  var _isInit = true;
+  //valores iniciales del formulario, que pueden ser alterados en caso de que se vaya a editar un producto existente
+  var _initValues = {
+    "title": "",
+    "description": "",
+    "price": "",
+    "imageUrl": "",
+  };
 
   //se crea un Listener para _imageUrlFocusNode al inicio de esta pantalla
   @override
   void initState() {
     super.initState();
     _imageUrlFocusNode.addListener(_updateImageUrl);
+  }
+
+  //se ejecuta periodicamente cuando se cambia el estado
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      //se obtiene el id que viene por parametro aqi, porque ModalRoute aun no esta listo cuando se ejecuta "initState()"
+      final productId = ModalRoute.of(context).settings.arguments as String;
+      if (productId != null) {
+        _editedProduct =
+            Provider.of<Products>(context, listen: false).findById(productId);
+        _initValues = {
+          "title": _editedProduct.title,
+          "description": _editedProduct.description,
+          "price": _editedProduct.price.toString(),
+          //"imageUrl": _editedProduct.imageUrl,
+        };
+        //para inicializar el Input del URL
+        _imageUrlController.text = _editedProduct.imageUrl;
+      }
+    }
+    super.didChangeDependencies();
   }
 
   //los FocusNode debe ser eliminados cuando se limpia el estado de este Widget, cuando dejas esta pantalla
@@ -64,8 +95,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
     //metodo de Flutter para guardar los datos del formulario
     _form.currentState.save();
 
-    //se realiza el insert a la lista de productos
-    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    //_editedProduct tendra solo id cuando se esta editando, asi que se usa esta vaidacion para identificar cuando este es el caso
+    if (_editedProduct.id != null) {
+      //se editan los datos de un producto especificado
+      Provider.of<Products>(context, listen: false)
+          .updateProduct(_editedProduct.id, _editedProduct);
+    } else {
+      //se realiza el insert a la lista de productos
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
 
     //para descartar esta pantalla y dirigirnos a la anterior que muestra todos los productos
     Navigator.of(context).pop();
@@ -94,6 +132,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
             children: <Widget>[
               //se conecta automaticamente con Form()
               TextFormField(
+                //para setear el valor inicial del input
+                initialValue: _initValues["title"],
                 decoration: InputDecoration(labelText: "Title"),
                 //esto permite que a darle a la flecha en la esquina inferior derecha del teclado, pase al siguiente Input del formulario en vez de hacer Submit
                 textInputAction: TextInputAction.next,
@@ -106,11 +146,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 onSaved: (value) {
                   //Product se llena por parte, pero como todos sus argumentos son final, se llenan de esta manera, creando un Product nuevo con los datos del viejo
                   _editedProduct = Product(
-                      id: null,
-                      title: value,
-                      description: _editedProduct.description,
-                      price: _editedProduct.price,
-                      imageUrl: _editedProduct.imageUrl);
+                    id: _editedProduct.id,
+                    title: value,
+                    description: _editedProduct.description,
+                    price: _editedProduct.price,
+                    imageUrl: _editedProduct.imageUrl,
+                    isFavorite: _editedProduct.isFavorite,
+                  );
                 },
                 validator: (value) {
                   if (value.isEmpty) {
@@ -120,6 +162,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                initialValue: _initValues["price"],
                 decoration: InputDecoration(labelText: "Price"),
                 textInputAction: TextInputAction.next,
                 //define el tipo de teclado que se mostrara
@@ -130,11 +173,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
                 onSaved: (value) {
                   _editedProduct = Product(
-                      id: null,
-                      title: _editedProduct.title,
-                      description: _editedProduct.description,
-                      price: double.parse(value),
-                      imageUrl: _editedProduct.imageUrl);
+                    id: _editedProduct.id,
+                    title: _editedProduct.title,
+                    description: _editedProduct.description,
+                    price: double.parse(value),
+                    imageUrl: _editedProduct.imageUrl,
+                    isFavorite: _editedProduct.isFavorite,
+                  );
                 },
                 validator: (value) {
                   if (value.isEmpty) {
@@ -151,6 +196,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                initialValue: _initValues["description"],
                 decoration: InputDecoration(labelText: "Descripcion"),
                 //tomando en cuenta que este campo puede ser mas largo
                 //muestra en pantalla simultaneamente tres lineas, pero se puede escribir tanto como se permita
@@ -163,11 +209,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
                 onSaved: (value) {
                   _editedProduct = Product(
-                      id: null,
-                      title: _editedProduct.title,
-                      description: value,
-                      price: _editedProduct.price,
-                      imageUrl: _editedProduct.imageUrl);
+                    id: _editedProduct.id,
+                    title: _editedProduct.title,
+                    description: value,
+                    price: _editedProduct.price,
+                    imageUrl: _editedProduct.imageUrl,
+                    isFavorite: _editedProduct.isFavorite,
+                  );
                 },
                 validator: (value) {
                   if (value.isEmpty) {
@@ -201,6 +249,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                   Expanded(
                     child: TextFormField(
+                      initialValue: _initValues["imageUrl"],
                       decoration: InputDecoration(
                         labelText: "Image URL",
                       ),
@@ -217,20 +266,25 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       },
                       onSaved: (value) {
                         _editedProduct = Product(
-                            id: null,
-                            title: _editedProduct.title,
-                            description: _editedProduct.description,
-                            price: _editedProduct.price,
-                            imageUrl: value);
+                          id: _editedProduct.id,
+                          title: _editedProduct.title,
+                          description: _editedProduct.description,
+                          price: _editedProduct.price,
+                          imageUrl: value,
+                          isFavorite: _editedProduct.isFavorite,
+                        );
                       },
                       validator: (value) {
                         if (value.isEmpty) {
                           return "Debe llenar este campo.";
                         }
-                        if(!value.startsWith("http") && !value.startsWith("https")){
+                        if (!value.startsWith("http") &&
+                            !value.startsWith("https")) {
                           return "El enlace no es válido, debe incluir el protocolo 'http' o 'https'.";
                         }
-                        if(!value.endsWith(".png") && !value.endsWith(".jpg") && !value.endsWith(".jpeg")){
+                        if (!value.endsWith(".png") &&
+                            !value.endsWith(".jpg") &&
+                            !value.endsWith(".jpeg")) {
                           return "Debe ingresar una imagen válida.";
                         }
                         return null;
