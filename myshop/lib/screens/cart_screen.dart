@@ -50,7 +50,7 @@ class CartScreen extends StatelessWidget {
                     onPressed: () {
                       //Se accede a la lista de Pedidos y se le agrega un nuevo pedido
                       //en vez de pasar todo el Map se pasa solo la lista de productos
-                      //no quereos escuchar aqui porque solo queremos registrar un pedido
+                      //no queremos escuchar aqui porque solo queremos registrar un pedido
                       Provider.of<Orders>(context, listen: false).addOrder(
                         cart.items.values.toList(),
                         cart.totalAmount,

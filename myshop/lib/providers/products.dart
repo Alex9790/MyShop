@@ -89,6 +89,11 @@ class Products with ChangeNotifier {
     
   }
 
+  void deleteProduct (String id){
+    _items.removeWhere((prod) => prod.id == id);
+    notifyListeners();
+  }
+
 /*Esta forma de aplicar filtros afectara todas las pantallas de productos, por lo que no se recomienda
 
   void showFavoritesOnly (){
