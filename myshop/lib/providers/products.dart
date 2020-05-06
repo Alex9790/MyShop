@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+//libreria que provee herramientas para convertir data
+import 'dart:convert';
 
 import './product.dart';
 
@@ -61,13 +64,28 @@ class Products with ChangeNotifier {
   }
 
   void addProduct(Product product) {
+    //URL base de firebase mas la collection donde se almacenan los productos
+    const url = "https://flutter-update-d1853.firebaseio.com/Products.json";
+    //peticion POST, que se ejecuta de manera asincrona sin detener la ejecucion del resto del metodo
+    http.post(
+      url,
+      //usando la libreria convert de Dart
+      body: json.encode({
+        "title": product.title,
+        "description": product.description,
+        "imageUrl": product.imageUrl,
+        "price": product.price,
+        "isFavorited": product.isFavorite,
+      }),
+    );
+
     final newProduct = Product(
         id: DateTime.now().toString(),
         title: product.title,
         description: product.description,
         price: product.price,
         imageUrl: product.imageUrl);
-    
+
     _items.add(newProduct);
     //para insertar al inicio de la lista
     //_items.insert(0, newProduct);
@@ -76,20 +94,19 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateProduct(String id, Product newProduct){
+  void updateProduct(String id, Product newProduct) {
     //para obtener el indice del product que se va a actualizar
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
-    if(prodIndex > 0){
+    if (prodIndex > 0) {
       //se actualiza con los nuevos datos
       _items[prodIndex] = newProduct;
       notifyListeners();
-    }else{
+    } else {
       print("No se encontro el indice.");
     }
-    
   }
 
-  void deleteProduct (String id){
+  void deleteProduct(String id) {
     _items.removeWhere((prod) => prod.id == id);
     notifyListeners();
   }
