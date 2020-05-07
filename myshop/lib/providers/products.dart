@@ -77,21 +77,26 @@ class Products with ChangeNotifier {
         "price": product.price,
         "isFavorited": product.isFavorite,
       }),
-    );
+    ).then((response) {
+      
+      //para ver el contenido del response
+      print(json.decode(response.body));
 
-    final newProduct = Product(
-        id: DateTime.now().toString(),
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        imageUrl: product.imageUrl);
-
-    _items.add(newProduct);
-    //para insertar al inicio de la lista
-    //_items.insert(0, newProduct);
-    //se utiliza para informar a todos los Widgets que estan conectados a este Provider con Listener
-    //que hay informacion nueva disponible
-    notifyListeners();
+      //se ejecuta esta seccion dentro de then() para forzarlo a esperar que se guarde el objeto en firebase y obtener el id generado en el response
+      final newProduct = Product(
+          //para obtener el id generado por firebase
+          id: json.decode(response.body)["name"],
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.imageUrl);
+      _items.add(newProduct);
+      //para insertar al inicio de la lista
+      //_items.insert(0, newProduct);
+      //se utiliza para informar a todos los Widgets que estan conectados a este Provider con Listener
+      //que hay informacion nueva disponible
+      notifyListeners();
+    });
   }
 
   void updateProduct(String id, Product newProduct) {
