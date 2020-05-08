@@ -63,11 +63,12 @@ class Products with ChangeNotifier {
     return _items.firstWhere((producto) => producto.id == id);
   }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     //URL base de firebase mas la collection donde se almacenan los productos
     const url = "https://flutter-update-d1853.firebaseio.com/Products.json";
     //peticion POST, que se ejecuta de manera asincrona sin detener la ejecucion del resto del metodo
-    http.post(
+    //con el cambio de void a Future<void> se debe retornar un future, no se puede colocar "return Future.value()" porque se ejecutaria de inmediato (ejecucion asyncrona)
+    return http.post(
       url,
       //usando la libreria convert de Dart
       body: json.encode({
@@ -78,7 +79,6 @@ class Products with ChangeNotifier {
         "isFavorited": product.isFavorite,
       }),
     ).then((response) {
-      
       //para ver el contenido del response
       print(json.decode(response.body));
 

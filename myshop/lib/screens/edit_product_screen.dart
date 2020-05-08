@@ -27,6 +27,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Product(id: null, title: "", description: "", price: 0, imageUrl: "");
   //para que se ejecute solo una vez al iniciar el Widget
   var _isInit = true;
+  //identificar si se esta cargando algo
+  var _isLoading = false;
   //valores iniciales del formulario, que pueden ser alterados en caso de que se vaya a editar un producto existente
   var _initValues = {
     "title": "",
@@ -92,6 +94,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (!isValid) {
       return;
     }
+    //se setea la bandera de cargando
+    setState(() {
+      _isLoading = true;
+    });
     //metodo de Flutter para guardar los datos del formulario
     _form.currentState.save();
 
@@ -100,13 +106,25 @@ class _EditProductScreenState extends State<EditProductScreen> {
       //se editan los datos de un producto especificado
       Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
     } else {
       //se realiza el insert a la lista de productos
-      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+      Provider.of<Products>(context, listen: false)
+          .addProduct(_editedProduct)
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+        //solo hace .pop() cuando se termina de registrar el producto
+        Navigator.of(context).pop();
+      });
     }
 
     //para descartar esta pantalla y dirigirnos a la anterior que muestra todos los productos
-    Navigator.of(context).pop();
+    //Navigator.of(context).pop();
   }
 
   @override
@@ -123,153 +141,39 @@ class _EditProductScreenState extends State<EditProductScreen> {
         ],
       ),
       //permite gestionar mejor los datos de entrada sin necesidad de hacerlo manualmente usando controladores
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          //para indicarle al form que utilice esta GlobalKey
-          key: _form,
-          child: ListView(
-            children: <Widget>[
-              //se conecta automaticamente con Form()
-              TextFormField(
-                //para setear el valor inicial del input
-                initialValue: _initValues["title"],
-                decoration: InputDecoration(labelText: "Title"),
-                //esto permite que a darle a la flecha en la esquina inferior derecha del teclado, pase al siguiente Input del formulario en vez de hacer Submit
-                textInputAction: TextInputAction.next,
-                //se ejecuta cuando el boton inferior derecho del teclado es presionado, toma como parametro el valor del textField
-                onFieldSubmitted: (value) {
-                  //al presionar el boton solo cambiar el foco al textField identificado por el FocusNode seleccionado
-                  FocusScope.of(context).requestFocus(_priceFocusNode);
-                },
-                //funcion que se ejecuta cuando es ejecutado el metodo .save al hacer submit
-                onSaved: (value) {
-                  //Product se llena por parte, pero como todos sus argumentos son final, se llenan de esta manera, creando un Product nuevo con los datos del viejo
-                  _editedProduct = Product(
-                    id: _editedProduct.id,
-                    title: value,
-                    description: _editedProduct.description,
-                    price: _editedProduct.price,
-                    imageUrl: _editedProduct.imageUrl,
-                    isFavorite: _editedProduct.isFavorite,
-                  );
-                },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return "Debe llenar este campo.";
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                initialValue: _initValues["price"],
-                decoration: InputDecoration(labelText: "Price"),
-                textInputAction: TextInputAction.next,
-                //define el tipo de teclado que se mostrara
-                keyboardType: TextInputType.number,
-                focusNode: _priceFocusNode,
-                onFieldSubmitted: (value) {
-                  FocusScope.of(context).requestFocus(_descriptionFocusNode);
-                },
-                onSaved: (value) {
-                  _editedProduct = Product(
-                    id: _editedProduct.id,
-                    title: _editedProduct.title,
-                    description: _editedProduct.description,
-                    price: double.parse(value),
-                    imageUrl: _editedProduct.imageUrl,
-                    isFavorite: _editedProduct.isFavorite,
-                  );
-                },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return "Debe llenar este campo.";
-                  }
-                  //retorna null si el numero es invalido, en vez de una excepcion, ideal para validar si es un numero
-                  if (double.tryParse(value) == null) {
-                    return "Debe ingresar un valor válido.";
-                  }
-                  if (double.parse(value) <= 0) {
-                    return "Debe ingresar un valor mayor a cero.";
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                initialValue: _initValues["description"],
-                decoration: InputDecoration(labelText: "Descripcion"),
-                //tomando en cuenta que este campo puede ser mas largo
-                //muestra en pantalla simultaneamente tres lineas, pero se puede escribir tanto como se permita
-                maxLines: 3,
-                //un teclado mas util para este tipo de inputs
-                keyboardType: TextInputType.multiline,
-                focusNode: _descriptionFocusNode,
-                onFieldSubmitted: (value) {
-                  FocusScope.of(context).requestFocus(_priceFocusNode);
-                },
-                onSaved: (value) {
-                  _editedProduct = Product(
-                    id: _editedProduct.id,
-                    title: _editedProduct.title,
-                    description: value,
-                    price: _editedProduct.price,
-                    imageUrl: _editedProduct.imageUrl,
-                    isFavorite: _editedProduct.isFavorite,
-                  );
-                },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return "Debe llenar este campo.";
-                  }
-                  if (value.length < 10) {
-                    return "Debe ingresar un minimo de 10 carácteres.";
-                  }
-                  return null;
-                },
-              ),
-              //contendra un preview de la imagen a cargar y la direccion
-              Row(
-                //mueve todo el contenido hacia "el piso digamos" den espacio definido
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    width: 100,
-                    height: 100,
-                    margin: EdgeInsets.only(top: 8, right: 10),
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.grey),
-                    ),
-                    //Se realiza un peticion para mostrar un preview de la imagen si se encuentra la url en el input
-                    child: _imageUrlController.text.isEmpty
-                        ? Text("Colocar Url de la Imagen")
-                        : FittedBox(
-                            child: Image.network(_imageUrlController.text),
-                            fit: BoxFit.cover,
-                          ),
-                  ),
-                  Expanded(
-                    child: TextFormField(                      
-                      decoration: InputDecoration(
-                        labelText: "Image URL",
-                      ),
-                      keyboardType: TextInputType.url,
-                      //cuando presione "enter" se intentara hacer submit
-                      textInputAction: TextInputAction.done,
-                      //se agrega controlador, porque se desea obtener el valor antes de submit
-                      controller: _imageUrlController,
-                      focusNode: _imageUrlFocusNode,
-                      //este es el ultimo input, asi que en el teclado en pantalla se vera un check, el cual queremos que haga submit tambien
-                      //el parametro "value" es el valor del input, en este caso no se necesita asi que se puede cambiar por (_)
+      body: _isLoading
+          ? Center(
+              //se muestra pantalla de carga cuando se activa _isLoading y se esta almacenando un producto en Firebase
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                //para indicarle al form que utilice esta GlobalKey
+                key: _form,
+                child: ListView(
+                  children: <Widget>[
+                    //se conecta automaticamente con Form()
+                    TextFormField(
+                      //para setear el valor inicial del input
+                      initialValue: _initValues["title"],
+                      decoration: InputDecoration(labelText: "Title"),
+                      //esto permite que a darle a la flecha en la esquina inferior derecha del teclado, pase al siguiente Input del formulario en vez de hacer Submit
+                      textInputAction: TextInputAction.next,
+                      //se ejecuta cuando el boton inferior derecho del teclado es presionado, toma como parametro el valor del textField
                       onFieldSubmitted: (value) {
-                        _saveForm();
+                        //al presionar el boton solo cambiar el foco al textField identificado por el FocusNode seleccionado
+                        FocusScope.of(context).requestFocus(_priceFocusNode);
                       },
+                      //funcion que se ejecuta cuando es ejecutado el metodo .save al hacer submit
                       onSaved: (value) {
+                        //Product se llena por parte, pero como todos sus argumentos son final, se llenan de esta manera, creando un Product nuevo con los datos del viejo
                         _editedProduct = Product(
                           id: _editedProduct.id,
-                          title: _editedProduct.title,
+                          title: value,
                           description: _editedProduct.description,
                           price: _editedProduct.price,
-                          imageUrl: value,
+                          imageUrl: _editedProduct.imageUrl,
                           isFavorite: _editedProduct.isFavorite,
                         );
                       },
@@ -277,25 +181,146 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         if (value.isEmpty) {
                           return "Debe llenar este campo.";
                         }
-                        if (!value.startsWith("http") &&
-                            !value.startsWith("https")) {
-                          return "El enlace no es válido, debe incluir el protocolo 'http' o 'https'.";
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      initialValue: _initValues["price"],
+                      decoration: InputDecoration(labelText: "Price"),
+                      textInputAction: TextInputAction.next,
+                      //define el tipo de teclado que se mostrara
+                      keyboardType: TextInputType.number,
+                      focusNode: _priceFocusNode,
+                      onFieldSubmitted: (value) {
+                        FocusScope.of(context)
+                            .requestFocus(_descriptionFocusNode);
+                      },
+                      onSaved: (value) {
+                        _editedProduct = Product(
+                          id: _editedProduct.id,
+                          title: _editedProduct.title,
+                          description: _editedProduct.description,
+                          price: double.parse(value),
+                          imageUrl: _editedProduct.imageUrl,
+                          isFavorite: _editedProduct.isFavorite,
+                        );
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Debe llenar este campo.";
                         }
-                        if (!value.endsWith(".png") &&
-                            !value.endsWith(".jpg") &&
-                            !value.endsWith(".jpeg")) {
-                          return "Debe ingresar una imagen válida.";
+                        //retorna null si el numero es invalido, en vez de una excepcion, ideal para validar si es un numero
+                        if (double.tryParse(value) == null) {
+                          return "Debe ingresar un valor válido.";
+                        }
+                        if (double.parse(value) <= 0) {
+                          return "Debe ingresar un valor mayor a cero.";
                         }
                         return null;
                       },
                     ),
-                  ),
-                ],
+                    TextFormField(
+                      initialValue: _initValues["description"],
+                      decoration: InputDecoration(labelText: "Descripcion"),
+                      //tomando en cuenta que este campo puede ser mas largo
+                      //muestra en pantalla simultaneamente tres lineas, pero se puede escribir tanto como se permita
+                      maxLines: 3,
+                      //un teclado mas util para este tipo de inputs
+                      keyboardType: TextInputType.multiline,
+                      focusNode: _descriptionFocusNode,
+                      onFieldSubmitted: (value) {
+                        FocusScope.of(context).requestFocus(_priceFocusNode);
+                      },
+                      onSaved: (value) {
+                        _editedProduct = Product(
+                          id: _editedProduct.id,
+                          title: _editedProduct.title,
+                          description: value,
+                          price: _editedProduct.price,
+                          imageUrl: _editedProduct.imageUrl,
+                          isFavorite: _editedProduct.isFavorite,
+                        );
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Debe llenar este campo.";
+                        }
+                        if (value.length < 10) {
+                          return "Debe ingresar un minimo de 10 carácteres.";
+                        }
+                        return null;
+                      },
+                    ),
+                    //contendra un preview de la imagen a cargar y la direccion
+                    Row(
+                      //mueve todo el contenido hacia "el piso digamos" den espacio definido
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Container(
+                          width: 100,
+                          height: 100,
+                          margin: EdgeInsets.only(top: 8, right: 10),
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1, color: Colors.grey),
+                          ),
+                          //Se realiza un peticion para mostrar un preview de la imagen si se encuentra la url en el input
+                          child: _imageUrlController.text.isEmpty
+                              ? Text("Colocar Url de la Imagen")
+                              : FittedBox(
+                                  child:
+                                      Image.network(_imageUrlController.text),
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              labelText: "Image URL",
+                            ),
+                            keyboardType: TextInputType.url,
+                            //cuando presione "enter" se intentara hacer submit
+                            textInputAction: TextInputAction.done,
+                            //se agrega controlador, porque se desea obtener el valor antes de submit
+                            controller: _imageUrlController,
+                            focusNode: _imageUrlFocusNode,
+                            //este es el ultimo input, asi que en el teclado en pantalla se vera un check, el cual queremos que haga submit tambien
+                            //el parametro "value" es el valor del input, en este caso no se necesita asi que se puede cambiar por (_)
+                            onFieldSubmitted: (value) {
+                              _saveForm();
+                            },
+                            onSaved: (value) {
+                              _editedProduct = Product(
+                                id: _editedProduct.id,
+                                title: _editedProduct.title,
+                                description: _editedProduct.description,
+                                price: _editedProduct.price,
+                                imageUrl: value,
+                                isFavorite: _editedProduct.isFavorite,
+                              );
+                            },
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Debe llenar este campo.";
+                              }
+                              if (!value.startsWith("http") &&
+                                  !value.startsWith("https")) {
+                                return "El enlace no es válido, debe incluir el protocolo 'http' o 'https'.";
+                              }
+                              if (!value.endsWith(".png") &&
+                                  !value.endsWith(".jpg") &&
+                                  !value.endsWith(".jpeg")) {
+                                return "Debe ingresar una imagen válida.";
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
