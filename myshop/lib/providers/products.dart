@@ -63,6 +63,22 @@ class Products with ChangeNotifier {
     return _items.firstWhere((producto) => producto.id == id);
   }
 
+  //metodo para obtener los productos de Firebase
+  Future<void> fetchAndSetProducts() async {
+    const url = "https://flutter-update-d1853.firebaseio.com/Products.json";
+
+    try{
+      //peticion GET para obtener los productos
+      final response = await http.get(url);
+      print(response);
+      print(json.decode(response.body));
+    }catch (error){
+      print("Error: "+error);
+      throw error;
+    }
+    
+  }
+
   Future<void> addProduct(Product product) async {
     //URL base de firebase mas la collection donde se almacenan los productos
     const url = "https://flutter-update-d1853.firebaseio.com/Products.json";

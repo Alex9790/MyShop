@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-//import 'package:provider/provider.dart';
 
 import '../widgets/products_grid.dart';
-//import '../providers/products.dart';
+import '../providers/products.dart';
 import '../widgets/badge.dart';
 import '../providers/cart.dart';
 import '../screens/cart_screen.dart';
@@ -23,6 +22,28 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var _showOnlyFavorites = false;
+  var _isInit = true;
+
+  @override
+  void initState() {    
+    super.initState();
+    //esto no funciona porque context aun no esta definido en initState
+    //Provider.of<Products>(context).fetchAndSetProducts();
+    //Solucion 1
+    //Future.delayed(Duration.zero).then((_){
+		//	Provider.of<Products>(context).fetchAndSetProducts();
+		//});
+  }
+
+  //Solucion dos para obtener productos desde Backend
+  @override
+  void didChangeDependencies() {    
+    super.didChangeDependencies();
+    if(_isInit){
+      Provider.of<Products>(context).fetchAndSetProducts();
+    }
+    _isInit = false;
+  }
 
   @override
   Widget build(BuildContext context) {
