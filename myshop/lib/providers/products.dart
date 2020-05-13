@@ -63,22 +63,25 @@ class Products with ChangeNotifier {
     return _items.firstWhere((producto) => producto.id == id);
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     //URL base de firebase mas la collection donde se almacenan los productos
     const url = "https://flutter-update-d1853.firebaseio.com/Products.json";
-    //peticion POST, que se ejecuta de manera asincrona sin detener la ejecucion del resto del metodo
-    //con el cambio de void a Future<void> se debe retornar un future, no se puede colocar "return Future.value()" porque se ejecutaria de inmediato (ejecucion asyncrona)
-    return http.post(
-      url,
-      //usando la libreria convert de Dart
-      body: json.encode({
-        "title": product.title,
-        "description": product.description,
-        "imageUrl": product.imageUrl,
-        "price": product.price,
-        "isFavorited": product.isFavorite,
-      }),
-    ).then((response) {
+
+    try {
+      //peticion POST, que se ejecuta de manera asincrona sin detener la ejecucion del resto del metodo
+      //con el cambio de void a Future<void> se debe retornar un future, no se puede colocar "return Future.value()" porque se ejecutaria de inmediato (ejecucion asyncrona)
+      final response = await http.post(
+        url,
+        //usando la libreria convert de Dart
+        body: json.encode({
+          "title": product.title,
+          "description": product.description,
+          "imageUrl": product.imageUrl,
+          "price": product.price,
+          "isFavorited": product.isFavorite,
+        }),
+      );
+
       //para ver el contenido del response
       print(json.decode(response.body));
 
@@ -96,12 +99,10 @@ class Products with ChangeNotifier {
       //se utiliza para informar a todos los Widgets que estan conectados a este Provider con Listener
       //que hay informacion nueva disponible
       notifyListeners();
-    }).catchError((error){
-      //Seccion para gestionar errores, pero desde la clase
-      print("Error: "+error);
-      //manda el error al metodo invocador, el widget en este caso
+    } catch (error) {
+      print("Error: " + error);
       throw error;
-    });
+    }
   }
 
   void updateProduct(String id, Product newProduct) {
