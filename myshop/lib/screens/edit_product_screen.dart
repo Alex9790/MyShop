@@ -114,7 +114,27 @@ class _EditProductScreenState extends State<EditProductScreen> {
       //se realiza el insert a la lista de productos
       Provider.of<Products>(context, listen: false)
           .addProduct(_editedProduct)
-          .then((_) {
+          .catchError((error) {
+        //imprimiendo log
+        print(error);
+        //gestion de errores en el Widget, de esta forma se puede mostrar algo al usuario
+        return showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text("Error"),
+            content: Text("Ha ocurrido un error inesperado"),
+            actions: <Widget>[
+              //boton para cerrar el dialog
+              FlatButton(
+                child: Text("Okey"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ),
+        );
+      }).then((_) {
         setState(() {
           _isLoading = false;
         });

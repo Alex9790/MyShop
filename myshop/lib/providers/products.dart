@@ -96,6 +96,11 @@ class Products with ChangeNotifier {
       //se utiliza para informar a todos los Widgets que estan conectados a este Provider con Listener
       //que hay informacion nueva disponible
       notifyListeners();
+    }).catchError((error){
+      //Seccion para gestionar errores, pero desde la clase
+      print("Error: "+error);
+      //manda el error al metodo invocador, el widget en este caso
+      throw error;
     });
   }
 
