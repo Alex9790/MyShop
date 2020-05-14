@@ -7,7 +7,7 @@ import './product.dart';
 
 class Products with ChangeNotifier {
   List<Product> _items = [
-    Product(
+/*    Product(
       id: 'p1',
       title: 'Red Shirt',
       description: 'A red shirt - it is pretty red!',
@@ -39,6 +39,7 @@ class Products with ChangeNotifier {
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
+*/
   ];
   //para filtrar lista de productos
   /*Esta forma de aplicar filtros afectara todas las pantallas de productos, por lo que no se recomienda
@@ -67,16 +68,31 @@ class Products with ChangeNotifier {
   Future<void> fetchAndSetProducts() async {
     const url = "https://flutter-update-d1853.firebaseio.com/Products.json";
 
-    try{
+    try {
       //peticion GET para obtener los productos
       final response = await http.get(url);
       print(response);
       print(json.decode(response.body));
-    }catch (error){
-      print("Error: "+error);
+      //se observa en el print() que se recibe un Map<String, Map>, pero Dart da un error si se coloca Map dentro del Map asi que se coloca dynamic
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      final List<Product> loadedProducts = [];
+      extractedData.forEach((productId, productData) {
+        loadedProducts.add(
+          Product(
+            id: productId,
+            title: productData["title"],
+            description: productData["dscription"],
+            price: productData["price"],
+            imageUrl: productData["imageUrl"],
+          ),
+        );
+      });
+      _items = loadedProducts;
+      notifyListeners();
+    } catch (error) {
+      print("Error: " + error);
       throw error;
     }
-    
   }
 
   Future<void> addProduct(Product product) async {
@@ -121,10 +137,24 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     //para obtener el indice del product que se va a actualizar
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex > 0) {
+      //para actualizar productos tambien en Firebase
+      //se cambia a final porque id es variable
+      final url =
+          "https://flutter-update-d1853.firebaseio.com/Products/$id.json";
+      await http.patch(
+        url,
+        body: json.encode({
+          "title": newProduct.title,
+          "description": newProduct.description,
+          "imageUrl": newProduct.imageUrl,
+          "price": newProduct.price,
+          "isFavorited": newProduct.isFavorite,
+        }),
+      );
       //se actualiza con los nuevos datos
       _items[prodIndex] = newProduct;
       notifyListeners();

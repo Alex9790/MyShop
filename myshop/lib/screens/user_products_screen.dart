@@ -9,6 +9,11 @@ import '../screens/edit_product_screen.dart';
 class UserProductsScreen extends StatelessWidget {
   static const routeName = "/user-products";
 
+  //se recibe el context asi por parametro poque este no es un Staful Widget
+  Future<void> _refreshProducts(BuildContext context) async {
+    await Provider.of<Products>(context).fetchAndSetProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final productsData = Provider.of<Products>(context);
@@ -31,20 +36,23 @@ class UserProductsScreen extends StatelessWidget {
       //Para incluir en esta pantalla el Drawer definido
       drawer: AppDrawer(),
       //se debe mostrar la lista de todos los productos
-      body: Padding(
-        padding: EdgeInsets.all(8),
-        child: ListView.builder(
-          //cantidad de productos
-          itemCount: productsData.items.length,
-          itemBuilder: (context, index) => Column(
-            children: <Widget>[
-              UserProductItem(
-                productsData.items[index].id,
-                productsData.items[index].title,
-                productsData.items[index].imageUrl,
-              ),
-              Divider(),
-            ],
+      body: RefreshIndicator(
+        onRefresh: () => _refreshProducts(context),
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: ListView.builder(
+            //cantidad de productos
+            itemCount: productsData.items.length,
+            itemBuilder: (context, index) => Column(
+              children: <Widget>[
+                UserProductItem(
+                  productsData.items[index].id,
+                  productsData.items[index].title,
+                  productsData.items[index].imageUrl,
+                ),
+                Divider(),
+              ],
+            ),
           ),
         ),
       ),

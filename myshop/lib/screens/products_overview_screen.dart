@@ -22,25 +22,35 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var _showOnlyFavorites = false;
+  //para cargar los productos cuando se caraga por primera vez la pantalla
   var _isInit = true;
+  //para mostrar pantalla de carga
+  var _isLoading = false;
 
   @override
-  void initState() {    
+  void initState() {
     super.initState();
     //esto no funciona porque context aun no esta definido en initState
     //Provider.of<Products>(context).fetchAndSetProducts();
     //Solucion 1
     //Future.delayed(Duration.zero).then((_){
-		//	Provider.of<Products>(context).fetchAndSetProducts();
-		//});
+    //	Provider.of<Products>(context).fetchAndSetProducts();
+    //});
   }
 
   //Solucion dos para obtener productos desde Backend
   @override
-  void didChangeDependencies() {    
+  void didChangeDependencies() {
     super.didChangeDependencies();
-    if(_isInit){
-      Provider.of<Products>(context).fetchAndSetProducts();
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<Products>(context).fetchAndSetProducts().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
     }
     _isInit = false;
   }
@@ -109,7 +119,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
       //Para incluir en esta pantalla el Drawer definido
       drawer: AppDrawer(),
       //se utiliza el metodo builder() que funciona igual a las ListView() donde no sabes cuantos elementos seran, y se mostraran solo los que quepan en pantalla
-      body: ProductsGrid(_showOnlyFavorites),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavorites),
     );
   }
 }

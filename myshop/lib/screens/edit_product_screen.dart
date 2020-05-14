@@ -88,7 +88,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     //metodo para ejecutar todas las validaciones definidas en los "validator" de cada TextFormField()
     final isValid = _form.currentState.validate();
     if (!isValid) {
@@ -104,7 +104,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     //_editedProduct tendra solo id cuando se esta editando, asi que se usa esta vaidacion para identificar cuando este es el caso
     if (_editedProduct.id != null) {
       //se editan los datos de un producto especificado
-      Provider.of<Products>(context, listen: false)
+      await Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
       setState(() {
         _isLoading = false;
@@ -112,7 +112,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Navigator.of(context).pop();
     } else {
       //se realiza el insert a la lista de productos
-      Provider.of<Products>(context, listen: false)
+      await Provider.of<Products>(context, listen: false)
           .addProduct(_editedProduct)
           .catchError((error) {
         //imprimiendo log
