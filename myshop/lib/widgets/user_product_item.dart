@@ -13,6 +13,10 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //se crea esta variable para poder ser usada en el catch de eliminar producto
+    //debido a que como la funcion es async, por lo tanto es Future, dart no puede estar seguro de context asi que genera un error
+    final scaffold = Scaffold.of(context);
+
     return ListTile(
       title: Text(title),
       leading: CircleAvatar(
@@ -27,15 +31,26 @@ class UserProductItem extends StatelessWidget {
               icon: Icon(Icons.edit),
               onPressed: () {
                 //navegacion para ir a la pantalla de edicion de productos, se manda como parametro el id del producto para buscarlo en la pantalla
-                Navigator.of(context).pushNamed(EditProductScreen.routeName, arguments: id);
+                Navigator.of(context)
+                    .pushNamed(EditProductScreen.routeName, arguments: id);
               },
               color: Theme.of(context).primaryColor,
             ),
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {
-                //para eliminar un producto de la lista
-                Provider.of<Products>(context, listen: false).deleteProduct(id);
+              onPressed: () async {
+                try {
+                  //para eliminar un producto de la lista, se agrega async y await para poder gestionar el posible error, de lo contrario dart no espera por el Future
+                  await Provider.of<Products>(context, listen: false)
+                      .deleteProduct(id);
+                } catch (e) {
+                  //se muestra ScnakBar del error
+                  scaffold.showSnackBar(
+                    SnackBar(
+                      content: Text("Error al eliminar producto", textAlign: TextAlign.center,),
+                    ),
+                  );
+                }
               },
               color: Theme.of(context).errorColor,
             ),
