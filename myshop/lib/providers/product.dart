@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart'; //para poder agregar @required
+//libreria que provee herramientas para convertir data / permite usar json.encode()
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 //clase que servira de modelo para todos los productos
-class Product with ChangeNotifier{
+class Product with ChangeNotifier {
   final String id;
   final String title;
   final String description;
@@ -15,12 +18,34 @@ class Product with ChangeNotifier{
       @required this.description,
       @required this.price,
       @required this.imageUrl,
-      this.isFavorite = false});  //valor por defecto
+      this.isFavorite = false}); //valor por defecto
 
-  void toggleFavoriteStatus(){
+  Future<void> toggleFavoriteStatus() async {
+    //se guarda el valor actual
+    final oldStatus = isFavorite;
+
     //invierte el valor del boolean que representa si es favorito o no
     isFavorite = !isFavorite;
     //informar a los listener para que actualicen, parece en setState()
     notifyListeners();
+
+    final url = "https://flutter-update-d1853.firebaseio.com/Products/$id.json";
+    try {
+      final response = await http.patch(
+        url,
+        body: json.encode({
+          "isFavorite": isFavorite,
+        }),
+      );
+      //error http
+      if (response.statusCode >= 400) {
+        isFavorite = oldStatus;
+        notifyListeners();
+      }
+    } catch (e) {
+      //en caso de error, rollback
+      isFavorite = oldStatus;
+      notifyListeners();
+    }
   }
 }
