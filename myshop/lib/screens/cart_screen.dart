@@ -46,25 +46,7 @@ class CartScreen extends StatelessWidget {
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
-                  FlatButton(
-                    onPressed: () {
-                      //Se accede a la lista de Pedidos y se le agrega un nuevo pedido
-                      //en vez de pasar todo el Map se pasa solo la lista de productos
-                      //no queremos escuchar aqui porque solo queremos registrar un pedido
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                        cart.items.values.toList(),
-                        cart.totalAmount,
-                      );
-                      //se eliminan los items del carrito
-                      cart.clear();
-                    },
-                    child: Text(
-                      "Order Now!",
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
+                  OrderButton(cart: cart),
                 ],
               ),
             ),
@@ -86,6 +68,56 @@ class CartScreen extends StatelessWidget {
                 cart.items.values.toList()[index].title),
           ))
         ],
+      ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key key,
+    @required this.cart,
+  }) : super(key: key);
+
+  final Cart cart;
+
+  @override
+  _OrderButtonState createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  var _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      //se desactiva el boton si no hay elementos en el carrito o si esta cargando un pedido
+      onPressed: (widget.cart.totalAmount <= 0 || _isLoading) 
+      ? null : () async {
+        setState(() {
+          _isLoading = true;
+        });
+        //Se accede a la lista de Pedidos y se le agrega un nuevo pedido
+        //en vez de pasar todo el Map se pasa solo la lista de productos
+        //no queremos escuchar aqui porque solo queremos registrar un pedido
+        await Provider.of<Orders>(context, listen: false).addOrder(
+          widget.cart.items.values.toList(),
+          widget.cart.totalAmount,
+        );
+
+        setState(() {
+          _isLoading = false;
+        });
+        
+        //se eliminan los items del carrito
+        widget.cart.clear();
+      },
+      //se muestra spinner de loading en vez de texto cuando se estan guardando pedidos
+      child: _isLoading ? CircularProgressIndicator() : Text(
+        "Order Now!",
+        style: TextStyle(
+          color: Theme.of(context).primaryColor,
+        ),
       ),
     );
   }
