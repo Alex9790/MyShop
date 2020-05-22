@@ -29,8 +29,49 @@ class Orders with ChangeNotifier {
     return [..._orders];
   }
 
+  Future<void> fetchAndSetOrders() async {
+    //URL base de firebase mas la collection donde se almacenan las ordenes
+    const url = "https://flutter-update-d1853.firebaseio.com/Orders.json";
+    final response = await http.get(url);
+    print(json.decode(response.body));
+
+    //contendra la lista de productos del pedido
+    final List<OrderItem> loadedOrders = [];
+
+    //data de pedidos obtenidos de firebase                   id      map
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    //proteger el codigo contra null
+    if (extractedData == null) {
+      return;
+    }
+    extractedData.forEach((orderId, orderData) {
+      loadedOrders.add(
+        OrderItem(
+          id: orderId,
+          amount: orderData["amount"],
+          products: (orderData["products"] as List<dynamic>)
+              .map(
+                (item) => CartItem(
+                  id: item["id"],
+                  title: item["title"],
+                  quantity: item["quantity"],
+                  price: item["price"],
+                ),
+              )
+              .toList(),
+          //esto sirve porque se almaceno en Firebase con .toIso8601String()
+          dateTime: DateTime.parse(orderData["dateTime"]),
+        ),
+      );
+    });
+
+    //se setea la lista global, se reversa para ordenar con el pedido mas reciente primero
+    _orders = loadedOrders.reversed.toList();
+    notifyListeners();
+  }
+
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
-    //URL base de firebase mas la collection donde se almacenan los productos
+    //URL base de firebase mas la collection donde se almacenan las ordenes
     const url = "https://flutter-update-d1853.firebaseio.com/Orders.json";
     final timestamp = DateTime.now();
     final response = await http.post(
@@ -40,12 +81,14 @@ class Orders with ChangeNotifier {
         //uniform string representation of dates, facilita convertir de vuelta a Datetime cuando recibes el dato
         "dateTime": timestamp.toIso8601String(),
         //para poder guardar en Firebase se debe convertir la lista de CartItem en una lista de Maps
-        "products": cartProducts.map((cartProduct) => {
-          "id": cartProduct.id,
-          "title": cartProduct.title,
-          "quantity": cartProduct.quantity,
-          "price": cartProduct.price
-        }).toList(),
+        "products": cartProducts
+            .map((cartProduct) => {
+                  "id": cartProduct.id,
+                  "title": cartProduct.title,
+                  "quantity": cartProduct.quantity,
+                  "price": cartProduct.price
+                })
+            .toList(),
       }),
     );
 
@@ -55,7 +98,7 @@ class Orders with ChangeNotifier {
         0,
         OrderItem(
           //para obtener el id generado en firebase
-          id: json.decode(response.body)["name"], 
+          id: json.decode(response.body)["name"],
           amount: total,
           products: cartProducts,
           dateTime: timestamp,

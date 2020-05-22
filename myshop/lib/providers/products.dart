@@ -78,6 +78,9 @@ class Products with ChangeNotifier {
       //se observa en el print() que se recibe un Map<String, Map>, pero Dart da un error si se coloca Map dentro del Map asi que se coloca dynamic
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
+      if (extractedData == null) {
+        return;
+      }
       extractedData.forEach((productId, productData) {
         loadedProducts.add(
           Product(
@@ -165,21 +168,20 @@ class Products with ChangeNotifier {
     }
   }
 
-    
-  Future<void>  deleteProduct(String id) async {
+  Future<void> deleteProduct(String id) async {
     final url = "https://flutter-update-d1853.firebaseio.com/Products/$id.json";
-    final existingProductIndex = _items.indexWhere((prod) => prod.id == id );
+    final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
     //elimina el producto de la lista, pero se mantiene en memoria poquese guarda en la variable existingProduct
-    _items.removeAt(existingProductIndex);    
+    _items.removeAt(existingProductIndex);
     //elimina el producto de la lista
-    //_items.removeWhere((prod) => prod.id == id);    
-    notifyListeners();  //se usa aqui porque tenemos la esperanza que todo estara bien (optimistic updating)
+    //_items.removeWhere((prod) => prod.id == id);
+    notifyListeners(); //se usa aqui porque tenemos la esperanza que todo estara bien (optimistic updating)
 
     //esta vez no se usa await, porque no nos interesa esperar
     final response = await http.delete(url);
     //se gestiona en caso de error http
-    if(response.statusCode >= 400){
+    if (response.statusCode >= 400) {
       //rollback de la eliminacion en la lista en caso de falla
       _items.insert(existingProductIndex, existingProduct);
       //se agrega aqui tambien porque esto se ejecuta asincronamente
@@ -189,7 +191,6 @@ class Products with ChangeNotifier {
     }
     //si es satisfactorio se elimina la referencia en memoria del producto
     existingProduct = null;
-    
   }
 
 /*Esta forma de aplicar filtros afectara todas las pantallas de productos, por lo que no se recomienda
