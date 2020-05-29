@@ -114,6 +114,8 @@ class _AuthCardState extends State<AuthCard> {
     });
     if (_authMode == AuthMode.Login) {
       // Log user in
+      await Provider.of<Auth>(context, listen: false)
+          .login(_authData["email"], _authData["password"]);
     } else {
       // Sign user up
       //se agrega async await, porque .singup() retorna un Future, sin await se comportara asyncronamente
