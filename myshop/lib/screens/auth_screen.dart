@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
+import '../models/http_exception.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -103,6 +104,26 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Ha ocurrido un Error"),
+        content: Text(message),
+        //botones para el dialog
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () {
+              //cerrar dialog
+              Navigator.of(context).pop();
+            },
+            child: Text("Ok"),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
@@ -112,16 +133,40 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    if (_authMode == AuthMode.Login) {
-      // Log user in
-      await Provider.of<Auth>(context, listen: false)
-          .login(_authData["email"], _authData["password"]);
-    } else {
-      // Sign user up
-      //se agrega async await, porque .singup() retorna un Future, sin await se comportara asyncronamente
-      await Provider.of<Auth>(context, listen: false)
-          .signup(_authData["email"], _authData["password"]);
+    try {
+      if (_authMode == AuthMode.Login) {
+        // Log user in
+        await Provider.of<Auth>(context, listen: false)
+            .login(_authData["email"], _authData["password"]);
+      } else {
+        // Sign user up
+        //se agrega async await, porque .singup() retorna un Future, sin await se comportara asyncronamente
+        await Provider.of<Auth>(context, listen: false)
+            .signup(_authData["email"], _authData["password"]);
+      }
+    } on HttpException catch (error) {
+      var errorMessage = "Error de autenticación.";
+
+      if (error.toString().contains("EMAIL_EXISTS")) {
+        errorMessage = "Este correo ya ha sido registrado.";
+      } else if (error.toString().contains("INVALID_EMAIL")) {
+        errorMessage = "Correo inválido.";
+      } else if (error.toString().contains("WEAK_PASSWORD")) {
+        errorMessage = "Esta contraseña es insegura.";
+      } else if (error.toString().contains("EMAIL_NOT_FOUND")) {
+        errorMessage = "Correo no encontrado.";
+      } else if (error.toString().contains("INVALID_PASSWORD")) {
+        errorMessage = "Contraseña inválida.";
+      }
+      //mostrando dialog
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      const errorMessage =
+          "No e logro realizar autenticación, por favor intente mas tarde.";
+      //mostrando dialog
+      _showErrorDialog(errorMessage);
     }
+
     setState(() {
       _isLoading = false;
     });
