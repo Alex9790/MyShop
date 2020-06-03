@@ -11,6 +11,21 @@ class Auth with ChangeNotifier {
   DateTime _expiryDate;
   String _userId;
 
+  //si tiene token y aun no esta vencido, entonces esta autenticado
+  bool get isAuth {
+    return _token != null;
+  }
+
+  //retorna el token asignado
+  String get token {
+    if (_expiryDate != null &&
+        _expiryDate.isAfter(DateTime.now()) &&
+        _token != null) {
+      return _token;
+    }
+    return null;
+  }
+
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
     final url =
@@ -35,6 +50,17 @@ class Auth with ChangeNotifier {
         //manejode errores con la clase de excepciones creada previamente
         throw HttpException(responseData["error"]["message"]);
       }
+      //en caso de no haber error se toma el token y userId
+      _token = responseData["idToken"];
+      _userId = responseData["localId"];
+      //para obtener la fecha de expiracion, se recibe del response "expiresIn" el cual es un vaor en segundos, se toma la fecha actual mas esos segundo
+      //para obtener la fecha de vencimiento
+      _expiryDate = DateTime.now().add(
+        Duration(
+          seconds: int.parse(responseData["expiresIn"]),
+        ),
+      );
+      notifyListeners();
     } catch (error) {
       //manejo de error por conexion http
       throw error;
