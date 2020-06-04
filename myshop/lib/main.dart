@@ -21,9 +21,22 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(
+          value: Auth(),
+        ),
+        /*ChangeNotifierProvider.value(
           //se debe agregar una instancia de la clase provider a utilizar, antes el argumento era "builder"
           //create: (ctx) => Products(),
           value: Products(),
+        ),*/
+        //Este metodo depende de Auth, por lo tanto Auth debe ser declarado arriba de este
+        ChangeNotifierProxyProvider<Auth, Products>(
+          //creas el provider con data inicial
+          create: (context) => Products("", []),
+          //cada actualizacion que ocurra en Auth, es notifica a Products y por lo tanto se actualiza
+          update: (context, auth, previousProducts) => Products(
+            auth.token,
+            previousProducts == null ? [] : previousProducts.items,
+          ),
         ),
         ChangeNotifierProvider.value(
           value: Cart(),
@@ -31,9 +44,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: Orders(),
         ),
-        ChangeNotifierProvider.value(
-          value: Auth(),
-        )
       ],
       //la idea es revisar si el usuario se encuentra autenticado o no, con la intencion de decidir si mostrar la pantalla de autenticacion o la lista de productos
       child: Consumer<Auth>(

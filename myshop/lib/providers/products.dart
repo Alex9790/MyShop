@@ -47,6 +47,11 @@ class Products with ChangeNotifier {
   /*Esta forma de aplicar filtros afectara todas las pantallas de productos, por lo que no se recomienda
   var _showFavoritesOnly = false;*/
 
+  //Token para consultar Firebase
+  final String authToken;
+
+  Products(this.authToken, this._items);
+
   //para obtener copia de datos _items
   List<Product> get items {
     /*Esta forma de aplicar filtros afectara todas las pantallas de productos, por lo que no se recomienda
@@ -68,7 +73,7 @@ class Products with ChangeNotifier {
 
   //metodo para obtener los productos de Firebase
   Future<void> fetchAndSetProducts() async {
-    const url = "https://flutter-update-d1853.firebaseio.com/Products.json";
+    final url = "https://flutter-update-d1853.firebaseio.com/Products.json?auth=$authToken";
 
     try {
       //peticion GET para obtener los productos
