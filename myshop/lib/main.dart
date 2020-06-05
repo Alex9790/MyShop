@@ -31,10 +31,11 @@ class MyApp extends StatelessWidget {
         //Este metodo depende de Auth, por lo tanto Auth debe ser declarado arriba de este
         ChangeNotifierProxyProvider<Auth, Products>(
           //creas el provider con data inicial
-          create: (context) => Products("", []),
+          create: (context) => Products("", "", []),
           //cada actualizacion que ocurra en Auth, es notifica a Products y por lo tanto se actualiza
           update: (context, auth, previousProducts) => Products(
             auth.token,
+            auth.userId,
             previousProducts == null ? [] : previousProducts.items,
           ),
         ),

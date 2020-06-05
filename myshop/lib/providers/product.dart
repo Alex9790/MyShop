@@ -20,7 +20,7 @@ class Product with ChangeNotifier {
       @required this.imageUrl,
       this.isFavorite = false}); //valor por defecto
 
-  Future<void> toggleFavoriteStatus(String token) async {
+  Future<void> toggleFavoriteStatus(String token, String userId) async {
     //se guarda el valor actual
     final oldStatus = isFavorite;
 
@@ -29,13 +29,13 @@ class Product with ChangeNotifier {
     //informar a los listener para que actualicen, parece en setState()
     notifyListeners();
 
-    final url = "https://flutter-update-d1853.firebaseio.com/Products/$id.json?auth=$token";
+    final url = "https://flutter-update-d1853.firebaseio.com/UserFavorites/$userId/$id.json?auth=$token";
     try {
-      final response = await http.patch(
+      final response = await http.put(
         url,
-        body: json.encode({
-          "isFavorite": isFavorite,
-        }),
+        body: json.encode(
+          isFavorite,
+        ),
       );
       //error http
       if (response.statusCode >= 400) {

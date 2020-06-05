@@ -55,7 +55,7 @@ class ProductItem extends StatelessWidget {
                   producto.isFavorite ? Icons.favorite : Icons.favorite_border),
               onPressed: () {
                 //asigna o desasigna un producto como favorito
-                producto.toggleFavoriteStatus(auth.token);
+                producto.toggleFavoriteStatus(auth.token, auth.userId);
               },
               color: Theme.of(context).accentColor,
             ),

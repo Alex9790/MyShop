@@ -49,8 +49,9 @@ class Products with ChangeNotifier {
 
   //Token para consultar Firebase
   final String authToken;
+  final String userId;
 
-  Products(this.authToken, this._items);
+  Products(this.authToken, this.userId, this._items);
 
   //para obtener copia de datos _items
   List<Product> get items {
@@ -73,7 +74,7 @@ class Products with ChangeNotifier {
 
   //metodo para obtener los productos de Firebase
   Future<void> fetchAndSetProducts() async {
-    final url = "https://flutter-update-d1853.firebaseio.com/Products.json?auth=$authToken";
+    var url = "https://flutter-update-d1853.firebaseio.com/Products.json?auth=$authToken";
 
     try {
       //peticion GET para obtener los productos
@@ -86,6 +87,12 @@ class Products with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
+
+      //buscar datos de cuales productos son favoritos
+      url = "https://flutter-update-d1853.firebaseio.com/UserFavorites/$userId.json?auth=$authToken";
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
+
       extractedData.forEach((productId, productData) {
         loadedProducts.add(
           Product(
@@ -94,6 +101,7 @@ class Products with ChangeNotifier {
             description: productData["dscription"],
             price: productData["price"],
             imageUrl: productData["imageUrl"],
+            isFavorite: favoriteData == null ? false : favoriteData[productId] ?? false,  //del map de favoritos, se toma el valor del que concuerde con el id del producto
           ),
         );
       });
@@ -120,7 +128,7 @@ class Products with ChangeNotifier {
           "description": product.description,
           "imageUrl": product.imageUrl,
           "price": product.price,
-          "isFavorite": product.isFavorite,
+          //"isFavorite": product.isFavorite, //se comenta porque ya no se asignara favorito directamente al poducto
         }),
       );
 
