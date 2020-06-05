@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
 import '../providers/cart.dart';
+import '../providers/auth.dart';
 
 //este Widget sera el item dentro del Grid que contendra la informacion de cada producto
 class ProductItem extends StatelessWidget {
@@ -19,6 +20,8 @@ class ProductItem extends StatelessWidget {
     final producto = Provider.of<Product>(context);
     //Recibe los datos de Cart, declara en Main usando MultiProvider, se coloca listen: false porque no importa si cambia cart
     final cart = Provider.of<Cart>(context, listen: false);
+    //recibir el token del provider Auth
+    final auth = Provider.of<Auth>(context, listen: false);
     //Clip Rounded Rectangle, forza los elementos hijos a adaptarse a una forma definida
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -52,7 +55,7 @@ class ProductItem extends StatelessWidget {
                   producto.isFavorite ? Icons.favorite : Icons.favorite_border),
               onPressed: () {
                 //asigna o desasigna un producto como favorito
-                producto.toggleFavoriteStatus();
+                producto.toggleFavoriteStatus(auth.token);
               },
               color: Theme.of(context).accentColor,
             ),

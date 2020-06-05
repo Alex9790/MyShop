@@ -107,7 +107,7 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     //URL base de firebase mas la collection donde se almacenan los productos
-    const url = "https://flutter-update-d1853.firebaseio.com/Products.json";
+    final url = "https://flutter-update-d1853.firebaseio.com/Products.json?auth=$authToken";
 
     try {
       //peticion POST, que se ejecuta de manera asincrona sin detener la ejecucion del resto del metodo
@@ -120,7 +120,7 @@ class Products with ChangeNotifier {
           "description": product.description,
           "imageUrl": product.imageUrl,
           "price": product.price,
-          "isFavorited": product.isFavorite,
+          "isFavorite": product.isFavorite,
         }),
       );
 
@@ -154,7 +154,7 @@ class Products with ChangeNotifier {
       //para actualizar productos tambien en Firebase
       //se cambia a final porque id es variable
       final url =
-          "https://flutter-update-d1853.firebaseio.com/Products/$id.json";
+          "https://flutter-update-d1853.firebaseio.com/Products/$id.json?auth=$authToken";
       await http.patch(
         url,
         body: json.encode({
@@ -162,7 +162,7 @@ class Products with ChangeNotifier {
           "description": newProduct.description,
           "imageUrl": newProduct.imageUrl,
           "price": newProduct.price,
-          "isFavorited": newProduct.isFavorite,
+          "isFavorite": newProduct.isFavorite,
         }),
       );
       //se actualiza con los nuevos datos
@@ -174,7 +174,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = "https://flutter-update-d1853.firebaseio.com/Products/$id.json";
+    final url = "https://flutter-update-d1853.firebaseio.com/Products/$id.json?auth=$authToken";
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
     //elimina el producto de la lista, pero se mantiene en memoria poquese guarda en la variable existingProduct

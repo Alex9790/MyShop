@@ -41,8 +41,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: Cart(),
         ),
-        ChangeNotifierProvider.value(
+        /*ChangeNotifierProvider.value(
           value: Orders(),
+        ),*/
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          create: (context) => Orders("", []),
+          update: (context, auth, previousOrders) => Orders(
+            auth.token,
+            previousOrders == null ? [] : previousOrders.orders,
+          ),
         ),
       ],
       //la idea es revisar si el usuario se encuentra autenticado o no, con la intencion de decidir si mostrar la pantalla de autenticacion o la lista de productos
