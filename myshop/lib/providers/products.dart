@@ -73,8 +73,9 @@ class Products with ChangeNotifier {
   }
 
   //metodo para obtener los productos de Firebase
-  Future<void> fetchAndSetProducts() async {
-    var url = "https://flutter-update-d1853.firebaseio.com/Products.json?auth=$authToken";
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+    var url = 'https://flutter-update-d1853.firebaseio.com/Products.json?auth=$authToken&$filterString';
 
     try {
       //peticion GET para obtener los productos
@@ -129,6 +130,7 @@ class Products with ChangeNotifier {
           "imageUrl": product.imageUrl,
           "price": product.price,
           //"isFavorite": product.isFavorite, //se comenta porque ya no se asignara favorito directamente al poducto
+          "creatorId": userId,
         }),
       );
 
