@@ -26,8 +26,9 @@ class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
   //token de autenticacion
   final String authToken;
+  final String userId;
 
-  Orders(this.authToken, this._orders);
+  Orders(this.authToken, this.userId, this._orders);
 
   List<OrderItem> get orders {
     return [..._orders];
@@ -35,7 +36,7 @@ class Orders with ChangeNotifier {
 
   Future<void> fetchAndSetOrders() async {
     //URL base de firebase mas la collection donde se almacenan las ordenes
-    final url = "https://flutter-update-d1853.firebaseio.com/Orders.json?auth=$authToken";
+    final url = "https://flutter-update-d1853.firebaseio.com/Orders/$userId.json?auth=$authToken";
     final response = await http.get(url);
     print(json.decode(response.body));
 
@@ -76,7 +77,7 @@ class Orders with ChangeNotifier {
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     //URL base de firebase mas la collection donde se almacenan las ordenes
-    final url = "https://flutter-update-d1853.firebaseio.com/Orders.json?auth=$authToken";
+    final url = "https://flutter-update-d1853.firebaseio.com/Orders/$userId.json?auth=$authToken";
     final timestamp = DateTime.now();
     final response = await http.post(
       url,
