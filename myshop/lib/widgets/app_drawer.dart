@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/orders_screen.dart';
 import '../screens/user_products_screen.dart';
+import '../providers/auth.dart';
 
 //Widget para definir un Drawer a la App
 class AppDrawer extends StatelessWidget {
@@ -40,6 +42,19 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               //redirige a la pantalla de Gestion de Productos
               Navigator.of(context).pushReplacementNamed(UserProductsScreen.routeName);
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text("Logout"),
+            onTap: () {
+              //para evitar error del drawer generado despues de hacer logout
+              Navigator.of(context).pop();
+              //para siempre retornar a la pantalla root
+              Navigator.of(context).pushReplacementNamed("/");
+              //logout de usuario
+              Provider.of<Auth>(context, listen: false).logout();
             },
           ),
         ],
