@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
-//import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/http_exception.dart';
 
@@ -73,7 +73,7 @@ class Auth with ChangeNotifier {
       notifyListeners();
 
       //Para gestionar shared preferences - se almacenan datos de sesion
-/*      final prefs = await SharedPreferences.getInstance();
+      final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(
         {
           "token": _token,
@@ -82,7 +82,6 @@ class Auth with ChangeNotifier {
         },
       );
       prefs.setString("userData", userData);
-*/      
     } catch (error) {
       //manejo de error por conexion http
       throw error;
@@ -98,7 +97,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<bool> tryAutoLogin() async {
-/*    print("aqui");
+    print("aqui");
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey("userData")) {
       return false;
@@ -120,8 +119,6 @@ class Auth with ChangeNotifier {
     //para setear el timer
     _autoLogout();
     return true;
-*/    
-    return false;
   }
 
   Future<void> logout() async{
@@ -135,11 +132,11 @@ class Auth with ChangeNotifier {
     notifyListeners();
 
     //limpiando shared preferences
-//    final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     //cuando solo se qiere limpiar data especifica
     //prefs.remove("userData");
-    //cuando se qiere limpiar toda la data
-//    prefs.clear();
+    //cuando se quiere limpiar toda la data
+    prefs.clear();
   }
 
   void _autoLogout() {
