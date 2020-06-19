@@ -36,11 +36,16 @@ class ProductItem extends StatelessWidget {
               arguments: producto.id,
             );
           },
-          child: Image.network(
+          child: FadeInImage(
+            placeholder: AssetImage("assets/images/product-placeholder.png"),
+            image: NetworkImage(producto.imageUrl),
+            fit: BoxFit.cover,
+          ),
+          /*Image.network(
             producto.imageUrl,
             //para que use todo el espacio que pueda obtener
             fit: BoxFit.cover,
-          ),
+          ),*/
         ),
         //configura una barra ubicada en el footer de GridTile
         footer: GridTileBar(
