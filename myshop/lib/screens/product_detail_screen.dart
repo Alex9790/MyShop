@@ -34,9 +34,12 @@ class ProductDetailScreen extends StatelessWidget {
               //tome todo el ancho posible
               width: double.infinity,
               //peticon http de la imagen que viene en el loadedProduct
-              child: Image.network(
-                loadedProduct.imageUrl,
-                fit: BoxFit.cover,
+              child: Hero(
+                tag: loadedProduct.id,
+                child: Image.network(
+                  loadedProduct.imageUrl,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             SizedBox(height: 10),
@@ -54,7 +57,8 @@ class ProductDetailScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              loadedProduct.description,
+              //loadedProduct.description,
+              loadedProduct.description != null ? loadedProduct.description : "Descripción",
               textAlign: TextAlign.center,
               //evita seguir escribiendo como si no hubiera limite de espacio horizontal
               softWrap: true,

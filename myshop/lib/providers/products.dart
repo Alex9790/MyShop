@@ -99,7 +99,7 @@ class Products with ChangeNotifier {
           Product(
             id: productId,
             title: productData["title"],
-            description: productData["dscription"],
+            description: productData["description"],
             price: productData["price"],
             imageUrl: productData["imageUrl"],
             isFavorite: favoriteData == null ? false : favoriteData[productId] ?? false,  //del map de favoritos, se toma el valor del que concuerde con el id del producto
