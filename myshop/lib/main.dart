@@ -13,6 +13,7 @@ import './screens/user_products_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/auth_screen.dart';
 import './screens/splash_screen.dart';
+import './helpers/custom_route.dart';
 
 void main() => runApp(MyApp());
 
@@ -63,6 +64,14 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.purple,
             accentColor: Colors.deepOrange,
             fontFamily: "Lato",
+            //aqui se pueden agregar transiciones tambien dependiendo del sistema operativo
+            pageTransitionsTheme: PageTransitionsTheme(
+              builders: {
+                //funciones builders que deben definir como se veran
+                TargetPlatform.android: CustomPageTransitionBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionBuilder(),
+              },
+            ),
           ),
           //si el token es valido va directo a la pantalla principal, lista de productos
           home: auth.isAuth
@@ -70,7 +79,11 @@ class MyApp extends StatelessWidget {
               //si no hay token asignado, y por lo tanto no esta autenticado, se intentara autenticar
               : FutureBuilder(
                   future: auth.tryAutoLogin(),
-                  builder: (context, authResultSnapshot) => authResultSnapshot.connectionState == ConnectionState.waiting ? SplashScreen() : AuthScreen(),
+                  builder: (context, authResultSnapshot) =>
+                      authResultSnapshot.connectionState ==
+                              ConnectionState.waiting
+                          ? SplashScreen()
+                          : AuthScreen(),
                 ),
           routes: {
             ProductDetailScreen.routeName: (context) => ProductDetailScreen(),

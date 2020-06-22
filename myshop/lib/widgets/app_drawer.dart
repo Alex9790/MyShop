@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../screens/orders_screen.dart';
 import '../screens/user_products_screen.dart';
 import '../providers/auth.dart';
+import '../helpers/custom_route.dart'; //para aplicar animacion a transicionde pantalla
 
 //Widget para definir un Drawer a la App
 class AppDrawer extends StatelessWidget {
@@ -32,7 +33,14 @@ class AppDrawer extends StatelessWidget {
             title: Text("Pedidos"),
             onTap: () {
               //redirige a la pantalla de Pedidos
-              Navigator.of(context).pushReplacementNamed(OrdersScreen.routeName);
+              //Navigator.of(context).pushReplacementNamed(OrdersScreen.routeName);
+
+              //para aplicar la nueva animacio al cambiar de pantalla
+              Navigator.of(context).pushReplacement(
+                CustomRoute(
+                  builder: (context) => OrdersScreen(),
+                ),
+              );
             },
           ),
           Divider(),
@@ -41,7 +49,8 @@ class AppDrawer extends StatelessWidget {
             title: Text("Gestion de Productos"),
             onTap: () {
               //redirige a la pantalla de Gestion de Productos
-              Navigator.of(context).pushReplacementNamed(UserProductsScreen.routeName);
+              Navigator.of(context)
+                  .pushReplacementNamed(UserProductsScreen.routeName);
             },
           ),
           Divider(),
