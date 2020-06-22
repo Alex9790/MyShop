@@ -22,49 +22,59 @@ class ProductDetailScreen extends StatelessWidget {
     ).findById(productId);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loadedProduct.title),
-      ),
+      //appBar: AppBar(
+      //  title: Text(loadedProduct.title),
+      //),
       //contenido del detalle del producto
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 300,
-              //tome todo el ancho posible
-              width: double.infinity,
-              //peticon http de la imagen que viene en el loadedProduct
-              child: Hero(
-                tag: loadedProduct.id,
-                child: Image.network(
-                  loadedProduct.imageUrl,
-                  fit: BoxFit.cover,
+      body: CustomScrollView(
+        //Scrollable areas on the screen
+        slivers: <Widget>[
+          SliverAppBar(
+            expandedHeight: 300,
+            //Appbar siempre sera visible
+            pinned: true,
+            //que deberia estar dentro del AppBar
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(loadedProduct.title),
+              background: Hero(
+                  tag: loadedProduct.id,
+                  child: Image.network(
+                    loadedProduct.imageUrl,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+            ),
+          ),
+          SliverList(
+            //como renderizar el contenido de la lista y como debe cambiar
+            delegate: SliverChildListDelegate([              
+              SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                width: double.infinity,
+                child: Text(
+                  "\$${loadedProduct.price}",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 20,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
-            ),
-            SizedBox(height: 10),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              width: double.infinity,
-              child: Text(
-                "\$${loadedProduct.price}",
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 20,
-                ),
+              SizedBox(height: 10),
+              Text(
+                //loadedProduct.description,
+                loadedProduct.description != null
+                    ? loadedProduct.description
+                    : "Descripción",
                 textAlign: TextAlign.center,
+                //evita seguir escribiendo como si no hubiera limite de espacio horizontal
+                softWrap: true,
               ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              //loadedProduct.description,
-              loadedProduct.description != null ? loadedProduct.description : "Descripción",
-              textAlign: TextAlign.center,
-              //evita seguir escribiendo como si no hubiera limite de espacio horizontal
-              softWrap: true,
-            ),
-          ],
-        ),
+              SizedBox(height: 800),
+            ]),
+          ),
+        ],        
       ),
     );
   }
